@@ -2,7 +2,6 @@
 name = "tradecredit-ai"
 version = "0.0.1"
 description = "Import-finance credit decisions: the LLM extracts, a deterministic scorecard decides, a human can override."
-readme = "../README.md"
 requires-python = ">=3.12,<3.13"
 dependencies = []
 
@@ -12,7 +11,7 @@ dev = [
     "pre-commit",
     "pytest",
     "pytest-cov",
-    "ruff",
+    "ruff==0.17.0",  # keep in step with .pre-commit-config.yaml
 ]
 
 [tool.uv]
