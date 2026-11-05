@@ -53,8 +53,10 @@ line by line.
 - Ports: `LLMProvider`, `Embedder`, `FileStorage`, `DocumentParser`. Each has a real adapter and a fake for tests.
 - Repository pattern: services call `repo.get(id)` / `repo.save(x)`, never raw SQL. SQLAlchemy repos in prod,
   in-memory repos in unit tests. A Unit of Work wraps each request.
-- State machine: `RECEIVED -> PARSING -> EXTRACTING -> SCORING -> DECIDING -> DECIDED | NEEDS_REVIEW | FAILED`.
-  Every transition is written to an append-only audit log.
+- State machine (9 states, `backend/app/domain/application.py`): `RECEIVED -> PARSING -> EXTRACTING -> SCORING ->
+  DECIDING -> DECIDED`, with `NEEDS_REVIEW_EXTRACTION` (a suspicious field, before scoring), `NEEDS_REVIEW_DECISION`
+  (a Refer) and `FAILED` (retries ran out; restarts only from `RECEIVED`). `ALLOWED_TRANSITIONS` is the whole map.
+  Every transition is written to an append-only audit log with who and why.
 - Sync for fast user-facing calls (< 200 ms). Async queue + worker for anything calling outside APIs.
   Jobs must be idempotent (idempotency keys), retried with exponential backoff, and dead-lettered on repeated failure.
 
