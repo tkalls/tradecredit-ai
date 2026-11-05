@@ -7,6 +7,7 @@ dependencies = []
 
 [dependency-groups]
 dev = [
+    "import-linter>=2.15",
     "mypy",
     "pre-commit",
     "pytest",
@@ -38,9 +39,26 @@ select = [
 [tool.mypy]
 python_version = "3.12"
 strict = true
-packages = ["app"]
+files = ["app", "tests"]  # tests are type-checked too
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
-addopts = "--cov=app --cov-report=term-missing"
+addopts = "--cov=app --cov-report=term-missing --cov-fail-under=90"
+
+# Layering from AGENTS.md: api -> services -> domain, never the other way.
+# `lint-imports` runs in CI. Layers that don't exist yet are skipped until they do.
+[tool.importlinter]
+root_packages = ["app"]
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "api -> services -> domain"
+type = "layers"
+layers = ["(app.api)", "(app.services)", "app.domain"]
+
+[[tool.importlinter.contracts]]
+name = "domain is plain Python: no other layer, no framework, no SDK"
+type = "forbidden"
+source_modules = ["app.domain"]
+forbidden_modules = ["app.api", "app.services", "app.adapters", "app.workers", "fastapi", "sqlalchemy", "anthropic", "celery", "redis"]

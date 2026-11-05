@@ -84,7 +84,9 @@ pytest + Testcontainers + Playwright, GitHub Actions. Package manager: `uv`.
 
 ## Commands
 
-Fill in as they exist:
-- Run tests: `TBD`
-- Lint/format: `TBD`
+Run from `backend/` (CI runs the same):
+- Tests: `uv run pytest` (fails under 90% coverage)
+- Lint/format: `uv run ruff check .` and `uv run ruff format --check .`
+- Types: `uv run mypy` (strict, `app/` and `tests/`)
+- Layering: `uv run lint-imports` (contracts in `pyproject.toml`)
 - Local stack: `docker compose up` (from Week 2)
