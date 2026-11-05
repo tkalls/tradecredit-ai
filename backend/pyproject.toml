@@ -12,7 +12,7 @@ dev = [
     "pre-commit",
     "pytest",
     "pytest-cov",
-    "ruff==0.17.0",  # keep in step with .pre-commit-config.yaml
+    "ruff==0.17.3",  # keep in step with .pre-commit-config.yaml
 ]
 
 [tool.uv]
