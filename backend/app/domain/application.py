@@ -69,7 +69,10 @@ class Transition:
 class Application:
     """A borrower's application. The only way to change its state is move_to()."""
 
-    def __init__(self, id: str, state: ApplicationState = ApplicationState.RECEIVED) -> None:
+    def __init__(
+        self, id: str, state: ApplicationState = ApplicationState.RECEIVED, version: int = 0
+    ) -> None:
+
         if not id.strip():
             raise ValueError("an application needs an id")
         self.id = id
@@ -77,6 +80,7 @@ class Application:
         # and raises ValueError for a state that doesn't exist.
         self._state = ApplicationState(state)
         self._history: list[Transition] = []
+        self.version = version
 
     @property
     def state(self) -> ApplicationState:
