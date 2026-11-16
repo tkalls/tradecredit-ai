@@ -39,7 +39,7 @@ select = [
 [tool.mypy]
 python_version = "3.12"
 strict = true
-files = ["app", "tests"]  # tests are type-checked too
+files = ["app", "synthetic", "tests"]  # tests are type-checked too
 
 [tool.pytest.ini_options]
 pythonpath = ["."]
@@ -49,8 +49,14 @@ addopts = "--cov=app --cov-report=term-missing --cov-fail-under=90"
 # Layering from AGENTS.md: api -> services -> domain, never the other way.
 # `lint-imports` runs in CI. Layers that don't exist yet are skipped until they do.
 [tool.importlinter]
-root_packages = ["app"]
+root_packages = ["app", "synthetic"]
 include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "synthetic is independent of app"
+type = "forbidden"
+source_modules = ["synthetic"]
+forbidden_modules = ["app"]
 
 [[tool.importlinter.contracts]]
 name = "api -> services -> domain"
