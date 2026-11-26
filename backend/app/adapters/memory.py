@@ -1,4 +1,5 @@
 import copy
+from typing import Self
 
 from app.domain.application import Application
 from app.domain.ports import ApplicationAlreadyExists, ApplicationNotFound, StaleApplication
@@ -26,3 +27,21 @@ class InMemoryApplicationRepository:
             raise StaleApplication(application.id)
         application.version += 1
         self._items[application.id] = copy.deepcopy(application)
+
+
+class InMemoryUnitOfWork:
+    def __init__(self) -> None:
+        self.applications = InMemoryApplicationRepository()
+        self._snapshot: dict[str, Application] = {}
+
+    def __enter__(self) -> Self:
+        return self
+
+    def __exit__(self, *args: object) -> None:
+        self.rollback()
+
+    def commit(self) -> None:
+        self._snapshot = copy.deepcopy(self.applications._items)
+
+    def rollback(self) -> None:
+        self.applications._items = copy.deepcopy(self._snapshot)
