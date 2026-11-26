@@ -5,7 +5,7 @@ app/adapters/ say *how* (a dict in memory for tests, Postgres in production). Se
 see the Protocol, so swapping the storage never touches the domain or the services.
 """
 
-from typing import Protocol
+from typing import Protocol, Self
 
 from app.domain.application import Application
 
@@ -38,4 +38,27 @@ class ApplicationRepository(Protocol):
         longer matches the stored one (another worker saved first). On success the version goes up
         by one, both on the stored copy and on the object passed in.
         """
+        ...
+
+
+class UnitOfWork(Protocol):
+    """One all-or-nothing piece of work.
+
+    Use it in a `with` block. Changes made through `applications` only stick if commit() is
+    called. Leaving the block without commit(), or because of an error, rolls them back.
+    """
+
+    @property
+    def applications(self) -> ApplicationRepository: ...
+
+    def __enter__(self) -> Self: ...
+
+    def __exit__(self, *args: object) -> None: ...
+
+    def commit(self) -> None:
+        """Keep everything changed since the block started or since the last commit()."""
+        ...
+
+    def rollback(self) -> None:
+        """Throw away everything changed since the block started or since the last commit()."""
         ...
